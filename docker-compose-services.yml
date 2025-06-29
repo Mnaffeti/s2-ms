@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  user-service:
+    build:
+      context: ./services/user
+    container_name: ms_user_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8090:8090"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  terrain-service:
+    build:
+      context: ./services/terrain
+    container_name: ms_terrain_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8091:8091"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  reservation-service:
+    build:
+      context: ./services/reservation
+    container_name: ms_reservation_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+    ports:
+      - "8096:8096"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ms_frontend
+    ports:
+      - "4200:4200"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
+    external: true

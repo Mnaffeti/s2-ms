@@ -1,0 +1,183 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: ms_pg_sql
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  mongodb:
+    container_name: ms_mongo_db
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+
+
+
+  config-server:
+    build:
+      context: ./services/config-server
+    container_name: ms_config_server
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  discovery-service:
+    build:
+      context: ./services/discovery
+    container_name: ms_discovery_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:24.0.2
+    ports:
+      - "8080:8080"
+    environment:
+      KC_HOSTNAME: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: [ "start-dev", "--import-realm" ]
+    volumes:
+      - ./realms:/opt/keycloak/data/import
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: ./services/user
+    container_name: ms_user_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8090:8090"
+    depends_on:
+      - discovery-service
+      - keycloak
+      - mongodb
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+
+
+  terrain-service:
+    build:
+      context: ./services/terrain
+    container_name: ms_terrain_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8091:8091"
+    depends_on:
+      - discovery-service
+      - keycloak
+      - mongodb
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  reservation-service:
+    build:
+      context: ./services/reservation
+    container_name: ms_reservation_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+    ports:
+      - "8096:8096"
+    depends_on:
+      - discovery-service
+      - keycloak
+      - mongodb
+      - user-service
+      - terrain-service
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+
+
+  gateway-service:
+    build:
+      context: ./services/gateway
+    container_name: ms_gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8222:8222"
+    depends_on:
+      - discovery-service
+      - user-service
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ms_frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - keycloak
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+
+
+  mongo-express:
+    image: mongo-express
+    container_name: ms_mongo_express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+  mongo:
+
+  

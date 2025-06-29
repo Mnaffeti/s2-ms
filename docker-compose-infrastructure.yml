@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  config-server:
+    build:
+      context: ./services/config-server
+    container_name: ms_config_server
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  discovery-service:
+    build:
+      context: ./services/discovery
+    container_name: ms_discovery_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  gateway-service:
+    build:
+      context: ./services/gateway
+    container_name: ms_gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://localhost:8761/eureka/
+    ports:
+      - "8222:8222"
+    depends_on:
+      - discovery-service
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
+    external: true
