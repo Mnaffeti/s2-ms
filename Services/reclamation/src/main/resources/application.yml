@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: optional:configserver:http://config-server:8888
+  application:
+    name: reclamation-service
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
