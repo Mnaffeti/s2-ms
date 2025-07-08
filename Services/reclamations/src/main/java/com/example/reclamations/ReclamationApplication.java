@@ -1,9 +1,11 @@
-package com.example.reclamation;
+package com.example.reclamations;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
+@EnableFeignClients
 public class ReclamationApplication {
 
 	public static void main(String[] args) {

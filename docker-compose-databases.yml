@@ -6,6 +6,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: root
+      POSTGRES_DB: reclamations
       POSTGRES_PASSWORD: root
       PGDATA: /var/lib/postgresql/data
     volumes:
