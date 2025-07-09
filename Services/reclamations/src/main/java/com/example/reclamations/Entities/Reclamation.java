@@ -18,7 +18,6 @@ public class Reclamation {
     @Id
     @GeneratedValue
     private int id;
-    @lombok.Setter
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date_resolution ;
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -37,49 +36,5 @@ public class Reclamation {
     // Ajout du champ userId pour la relation
     private String userId;
 
-    // Getter et Setter pour le nouveau champ
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public LocalDate getDate_resolution() {
-        return date_resolution;
-    }
-
-    public LocalDate getDate_soumission() {
-        return date_soumission;
-    }
-
-    public void setDate_soumission(LocalDate date_soumission) {
-        this.date_soumission = date_soumission;
-    }
-
-    public TypeReclamation getTypeReclamation() {
-        return typeReclamation;
-    }
-
-    public void setTypeReclamation(TypeReclamation typeReclamation) {
-        this.typeReclamation = typeReclamation;
-    }
-
-    public Statut getStatut() {
-        return statut;
-    }
-
-    public void setStatut(Statut statut) {
-        this.statut = statut;
-    }
 
 }

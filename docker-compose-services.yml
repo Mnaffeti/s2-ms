@@ -25,6 +25,18 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  reservation-service:
+    build:
+      context: ./services/reservation
+    container_name: ms_reservation_service
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+    ports:
+      - "8096:8096"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
   frontend:
     build:
       context: ./frontend

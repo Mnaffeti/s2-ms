@@ -1,12 +1,14 @@
 spring:
-  profiles:
-    active: native
   application:
     name: config-server
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:/configurations
+        git:
+          uri: https://github.com/Mnaffeti/config-server.git
+          username: Mnaffeti
+          password: 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
+          default-label: main
+          clone-on-start: true
 server:
   port: 8888

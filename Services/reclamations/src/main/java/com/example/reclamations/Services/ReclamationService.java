@@ -5,6 +5,8 @@ import com.example.reclamations.DTO.ReclamationStatistiquesDTO;
 import com.example.reclamations.DTO.UserDTO;
 import com.example.reclamations.Entities.Reclamation;
 import com.example.reclamations.Entities.Statut;
+import com.example.reclamations.Kafka.ReclamationConfirmation;
+import com.example.reclamations.Kafka.ReclamationProducer;
 import com.example.reclamations.Repositories.ReclamationRepository;
 import com.example.reclamations.feignclients.UserFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +22,20 @@ import java.util.stream.Collectors;
 @Service
 public class ReclamationService {
 
+    private final ReclamationProducer reclamationProducer;
+
     @Autowired
     private ReclamationRepository reclamationRepository;
-    private EmailService emailService;
+
     private UserFeignClient userFeignClient;
 
 
-    public ReclamationService(ReclamationRepository reclamationRepository, EmailService emailService, UserFeignClient userFeignClient) {
+
+
+    public ReclamationService(ReclamationProducer reclamationProducer, ReclamationRepository reclamationRepository, UserFeignClient userFeignClient) {
+        this.reclamationProducer = reclamationProducer;
         this.reclamationRepository = reclamationRepository;
-        this.emailService = emailService;
+
         this.userFeignClient = userFeignClient;
     }
 
@@ -56,12 +63,11 @@ public class ReclamationService {
         }
 
         Reclamation savedReclamation = reclamationRepository.save(reclamation);
+        reclamationProducer.sendReclamation(new ReclamationConfirmation(savedReclamation.getEmail(),savedReclamation.getId(),
+                        savedReclamation.getUserId())
+                );
 
-        // Envoyer un email de confirmation
-        emailService.sendReclamationConfirmation(
-                savedReclamation.getEmail(),
-                savedReclamation.getId()
-        );
+
 
         return savedReclamation;
     }
@@ -143,5 +149,6 @@ public class ReclamationService {
                 .filter(r -> userId.equals(r.getUserId()))
                 .collect(Collectors.toList());
     }
+
 
 }
