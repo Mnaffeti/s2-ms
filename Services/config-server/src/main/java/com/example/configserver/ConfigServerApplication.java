@@ -10,8 +10,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class ConfigServerApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-		String token = dotenv.get("MY_SECRET_TOKEN");
 		SpringApplication.run(ConfigServerApplication.class, args);
 	}
 

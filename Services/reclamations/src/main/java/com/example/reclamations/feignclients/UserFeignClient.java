@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface UserFeignClient {
 
-    @GetMapping("/api/users/exits/{user-id}")
+    @GetMapping("/exits/{user-id}")
     ResponseEntity<Boolean> existsById(@PathVariable("user-id") String id);
 
-    @GetMapping("/api/users/{user-id}")
+    @GetMapping("/{user-id}")
     ResponseEntity<UserDTO> findById(@PathVariable("user-id") String id);
 }

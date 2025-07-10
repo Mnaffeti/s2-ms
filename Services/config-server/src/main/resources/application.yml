@@ -7,7 +7,7 @@ spring:
         git:
           uri: https://github.com/Mnaffeti/config-server.git
           username: Mnaffeti
-          password: ${MY_SECRET_TOKEN}
+          password: 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
           default-label: main
           clone-on-start: true
 server:

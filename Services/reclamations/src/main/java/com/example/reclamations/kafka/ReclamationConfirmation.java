@@ -1,4 +1,4 @@
-package com.example.reclamations.Kafka;
+package com.example.reclamations.kafka;
 
 public record ReclamationConfirmation (
     String mail ,
